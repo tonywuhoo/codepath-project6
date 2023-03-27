@@ -1,26 +1,26 @@
 # Web Development Project 5 - *Name of App Here*
 
-Submitted by: **Your Name Here**
+Submitted by: **Tony Wu**
 
-This web app: **insert description**
+This web app: **A weather app that displays daily tempature with precipitation in inches in NY, shows the highest and lowest degrees in Celsius. Sunrise, Sunset, and has two filter, one for filtering by time of day, another for filtering by precipitation**
 
-Time spent: **X** hours spent in total
+Time spent: **5** hours spent in total
 
 ## Required Features
 
 The following **required** functionality is completed:
 
-- [ ] **The list displays a list of data fetched using an API call**
-- [ ] **Data uses the useEffect React hook and async/await syntax**
-- [ ] **The app dashboard includes at least three summary statistics about the data such as**
+- [X] **The list displays a list of data fetched using an API call**
+- [X] **Data uses the useEffect React hook and async/await syntax**
+- [X] **The app dashboard includes at least three summary statistics about the data such as**
   - [ ] *insert details*
-- [ ] **A search bar allows the user to search for an item in the fetched data**
-- [ ] **Multiple different filters (2+) allow the user to filter items in the database by specified categories**
+- [X] **A search bar allows the user to search for an item in the fetched data**
+- [X] **Multiple different filters (2+) allow the user to filter items in the database by specified categories**
 
 The following **optional** features are implemented:
 
 - [ ] Multiple filters can be applied simultaneously
-- [ ] Filters use different input types such as a text input, a selection, or a slider
+- [X] Filters use different input types such as a text input, a selection, or a slider
 - [ ] The user can enter specific bounds for filter values
 
 The following **additional** features are implemented:

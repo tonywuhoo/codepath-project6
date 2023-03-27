@@ -11,9 +11,10 @@ function App() {
   const [sunrise, setsunrise] = useState("")
   const [hourly, sethourly] = useState([])
   const [tempature, settempature] = useState([])
+  const [precipitation, setprecipitation] = useState([])
   const [displayTempature, setdisplayTempature] = useState([])
   const [displayHourly, setdisplayHourly] = useState([])
-  const [precipitation, setprecipitation] = useState([])
+  const [displayPrecipitation, setdisplayPrecipitation] = useState([])
   const [highest, sethighest] = useState("")
   const [lowest, setlowest] = useState("")
   const [selectedOption, setSelectedOption] = useState("");
@@ -46,6 +47,7 @@ function App() {
           setprecipitation(data.hourly.precipitation.slice(0, 24))
           setdisplayHourly(data.hourly.time.slice(0, 24))
           setdisplayTempature(data.hourly.temperature_2m.slice(0, 24))
+          setdisplayPrecipitation(data.hourly.precipitation.slice(0, 24))
           setlowest(Math.min(...data.hourly.temperature_2m.slice(0, 24)))
           sethighest(Math.max(...data.hourly.temperature_2m.slice(0, 24)))
         })
@@ -53,26 +55,51 @@ function App() {
     setfetchStatus(false)
     if (selectedOption.value == "Morning") {
       setdisplayHourly(hourly.slice(0, 13))
-      setdisplayTempature(tempature.slice(0,13))
+      setdisplayTempature(tempature.slice(0, 13))
+      setdisplayPrecipitation(precipitation.slice(0,13))
       console.log("Morning")
     }
     if (selectedOption.value == "Afternoon") {
       setdisplayHourly(hourly.slice(12, 19))
-      setdisplayTempature(tempature.slice(12,19))
+      setdisplayTempature(tempature.slice(12, 19))
+      setdisplayPrecipitation(precipitation.slice(12,19))
       console.log("Afternoon")
     }
     if (selectedOption.value == "Night") {
       setdisplayHourly(hourly.slice(18, 24))
-      setdisplayTempature(tempature.slice(18,24))
+      setdisplayTempature(tempature.slice(18, 24))
+      setdisplayPrecipitation(precipitation.slice(18,24))
       console.log("Night")
     }
     if (selectedOption.value == "All") {
       setdisplayHourly(hourly)
       setdisplayTempature(tempature)
+      setdisplayPrecipitation(precipitation)
       console.log("All")
     }
     if (checked == true) {
-      
+      let newTempatureDisplay = []
+      let newHourlyDisplay = []
+      let newPrecipitationDisplay = []
+      for (let i = 0; i < precipitation.length; i++){
+        if (precipitation[i] != 0) {
+          newTempatureDisplay.push(i)
+          newHourlyDisplay.push(i)
+          newPrecipitationDisplay.push(i)
+        }
+      }
+      setdisplayHourly([])
+      setdisplayTempature([])
+      setdisplayPrecipitation([])
+      for (let i = 0; i < newTempatureDisplay.length; i++){
+        newTempatureDisplay[i] = tempature[newTempatureDisplay[i]]
+        newHourlyDisplay[i] = hourly[newHourlyDisplay[i]]
+        newPrecipitationDisplay[i] = precipitation[newPrecipitationDisplay[i]]
+        
+      }
+      setdisplayHourly(newHourlyDisplay)
+      setdisplayTempature(newTempatureDisplay)
+      setdisplayPrecipitation(newPrecipitationDisplay)
     }
   },[selectedOption,checked]);
 
@@ -99,7 +126,7 @@ function App() {
       <Dashboard
         displayHourly={displayHourly}
         displayTempature={displayTempature}
-        precipitation = {precipitation}
+        displayPrecipitation = {displayPrecipitation}
       />
     </div>
   )

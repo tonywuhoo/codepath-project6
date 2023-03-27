@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Select from 'react-select';
 import '../App.css'
 
-function Dashboard({displayHourly, displayTempature,precipitation}) {
+function Dashboard({displayHourly, displayTempature, displayPrecipitation}) {
   return (
     <div className="dashboard-container">
       <div className='container-elements'>
@@ -28,7 +28,7 @@ function Dashboard({displayHourly, displayTempature,precipitation}) {
       </div>
       <div className='container-elements'>
         Precipitation:
-      {precipitation.map((element, index) => {
+      {displayPrecipitation.map((element, index) => {
         return (
           <ul key= {index}>
           {element}
