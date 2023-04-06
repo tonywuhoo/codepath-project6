@@ -20,6 +20,7 @@ function Search({handleChange, handleSubmit, checked}) {
       />
       <br></br>
       <button id="reset" onClick={handleSubmit}>Reset</button>
+
     </div>
   )
 }
