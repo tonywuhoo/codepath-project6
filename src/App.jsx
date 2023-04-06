@@ -2,198 +2,150 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import Header from './components/header.jsx'
 import Dashboard from './components/dashboard.jsx'
-import Select from 'react-select';
-
+import Charts from './components/charts.jsx'
+import Search from './components/Search.jsx'
+import WeatherDetails from './components/WeatherDetail.jsx'
+import { Routes, Route } from "react-router-dom";
 import './App.css'
 
 function App() {
-  const [sunset, setsunset] = useState("")
-  const [sunrise, setsunrise] = useState("")
-  const [hourly, sethourly] = useState([])
-  const [tempature, settempature] = useState([])
-  const [precipitation, setprecipitation] = useState([])
-  const [displayTempature, setdisplayTempature] = useState([])
-  const [displayHourly, setdisplayHourly] = useState([])
-  const [displayPrecipitation, setdisplayPrecipitation] = useState([])
+  //Header Display States
+  const [timezone, settimezone] = useState("")
+  const [today, set_today] = useState([])
   const [highest, sethighest] = useState("")
   const [lowest, setlowest] = useState("")
-  const [selectedOption, setSelectedOption] = useState("");
-  const [fetchStatus, setfetchStatus] = useState(true)
-  const [checked, setChecked] = useState(false)
-  const [startTempatureSearch, setstartTempatureSearch] = useState("")
-  const [endTempatureSearch, setendTempatureSearch] = useState("")
-  const [filteredIndexes, setFilteredIndexes] = useState([])
+
+  //Main Data Fetched
+  const [fetched_weather, set_fetched_weather] = useState([])
+
+  //Search Data
+  const [search, set_search] = useState("")
+  //Chart Data (Static)
+
+  const [min_chartData, set_min_chartData] = useState([])
+  const [max_chartData, set_max_chartData] = useState([])
   
-  const options = [
-    { value: 'Morning', label: 'Morning' },
-    { value: 'Afternoon', label: 'Afternoon' },
-    { value: 'Night', label: 'Night' },
-    { value: 'All', label: 'All' },
-  ];
+  //Dynamic States, to be displayed
+  const [displayData, set_displayData] = useState([])
+
+  //Bools
+  const [selectedOption, setSelectedOption] = useState("");
+  const [fetch_status, set_fetch_status] = useState(true)
+  const [checked, set_checked] = useState(false)
+
 
   function handleChange(event) {
+    if (event.target.id == "search-date-input") {
+      set_search(event.target.value)
+    }
     if (event.target.id == "checkbox-precipitation") {
-      setChecked(!checked)
-    }
-    if (event.target.id == "starting-tempature") {
-      setstartTempatureSearch(event.target.value)
-    }
-    if (event.target.id == "ending-tempature") {
-      setendTempatureSearch(event.target.value)
+      set_checked(!checked)
     }
   };
 
   function handleSubmit(event) {
     event.preventDefault()
-    if (event.target.id == "reset") {
-      setSelectedOption({ value: 'All', label: 'All' })
+    if (event.target.id == "search-by-date") {
+      setSelectedOption("Searching")
     }
-    if (event.target.id == "tempature-form") {
-      if (startTempatureSearch == "" || endTempatureSearch == "") {
-        alert("Enter Values to Filter")
-      } else {
-        let indexes = []
-        for (let i = 0; i < tempature.length; i++){
-          if (tempature[i] >= startTempatureSearch && tempature[i] <= endTempatureSearch) {
-            indexes.push(i)
-          }
-        }
-        setFilteredIndexes(indexes)
-        setSelectedOption("TempatureSearch")
-      }
+    if (event.target.id == "reset") {
+      set_displayData(fetched_weather)
+      setSelectedOption("Default")
+      set_checked(false)
     }
   }
 
-  const URL = "https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&hourly=temperature_2m,precipitation&daily=sunrise,sunset&timezone=auto"
+  const URL = "https://api.weatherbit.io/v2.0/forecast/daily?city=NewYork,NY&key=e4f367599827495a9f72bc3972821006"
 
   useEffect(() => {
-    if (fetchStatus == true) {
+    if (fetch_status == true) {
       fetch(URL)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data)
-          setsunset(data.daily.sunset[0])
-          setsunrise(data.daily.sunrise[0])
-          sethourly(data.hourly.time.slice(0, 24))
-          settempature(data.hourly.temperature_2m.slice(0, 24))
-          setprecipitation(data.hourly.precipitation.slice(0, 24))
-          setdisplayHourly(data.hourly.time.slice(0, 24))
-          setdisplayTempature(data.hourly.temperature_2m.slice(0, 24))
-          setdisplayPrecipitation(data.hourly.precipitation.slice(0, 24))
-          setlowest(Math.min(...data.hourly.temperature_2m.slice(0, 24)))
-          sethighest(Math.max(...data.hourly.temperature_2m.slice(0, 24)))
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        console.log(data)
+        set_fetched_weather(data.data)
+        const max_temp_data = data.data.map((element) => {
+          return {
+            Date: element.datetime,
+            Temp: element.app_max_temp 
+          };
         })
+        const min_temp_data = data.data.map((element) => {
+          return {
+            Date: element.datetime,
+            Temp: element.app_min_temp 
+          };
+        })
+        set_max_chartData(max_temp_data.slice(0, 6))
+        set_min_chartData(min_temp_data.slice(0, 6))
+        set_displayData(data.data)
+        set_today(data.data[0].valid_date)
+        settimezone(data.timezone)
+        sethighest(data.data[0].app_max_temp)
+        setlowest(data.data[0].app_min_temp)
+      })
+      const min_temp_data = fetched_weather.map((element) => {
+        return {
+          Date: element.datetime,
+          Temp: element.app_min_temp 
+        };
+      })
+      console.log(min_temp_data)
+      set_fetch_status(false)
+
     }
-    setfetchStatus(false)
-    if (selectedOption.value == "Morning") {
-      setdisplayHourly(hourly.slice(0, 13))
-      setdisplayTempature(tempature.slice(0, 13))
-      setdisplayPrecipitation(precipitation.slice(0, 13))
-      console.log(displayHourly)
-      console.log("Morning")
-    }
-    if (selectedOption.value == "Afternoon") {
-      setdisplayHourly(hourly.slice(12, 19))
-      setdisplayTempature(tempature.slice(12, 19))
-      setdisplayPrecipitation(precipitation.slice(12,19))
-      console.log("Afternoon")
-    }
-    if (selectedOption.value == "Night") {
-      setdisplayHourly(hourly.slice(18, 24))
-      setdisplayTempature(tempature.slice(18, 24))
-      setdisplayPrecipitation(precipitation.slice(18,24))
-      console.log("Night")
-    }
-    if (selectedOption.value == "All") {
-      setdisplayHourly(hourly)
-      setdisplayTempature(tempature)
-      setdisplayPrecipitation(precipitation)
-      console.log("All")
-    }
-    if (selectedOption == "TempatureSearch") {
-      console.log(filteredIndexes)
-      let newTempatureDisplay = []
-      let newHourlyDisplay = []
-      let newPrecipitationDisplay = []
-            setdisplayHourly([])
-      setdisplayTempature([])
-      setdisplayPrecipitation([])
-      for (let i = 0; i < filteredIndexes.length; i++){
-        newTempatureDisplay[i] = tempature[filteredIndexes[i]]
-        newHourlyDisplay[i] = hourly[filteredIndexes[i]]
-        newPrecipitationDisplay[i] = precipitation[filteredIndexes[i]]
-      }
-      setdisplayHourly(newHourlyDisplay)
-      setdisplayTempature(newTempatureDisplay)
-      setdisplayPrecipitation(newPrecipitationDisplay)
-    }
-    if (checked == true) {
-      let newTempatureDisplay = []
-      let newHourlyDisplay = []
-      let newPrecipitationDisplay = []
-      for (let i = 0; i < precipitation.length; i++){
-        if (precipitation[i] != 0) {
-          newTempatureDisplay.push(i)
-          newHourlyDisplay.push(i)
-          newPrecipitationDisplay.push(i)
+    if (selectedOption == "Searching") {
+      for (let i = 0; i < fetched_weather.length; i++){
+        if (fetched_weather[i].datetime == search) {
+          console.log(fetched_weather[i].datetime)
+          console.log(displayData[i])
+          set_displayData([fetched_weather[i]])
         }
       }
-      setdisplayHourly([])
-      setdisplayTempature([])
-      setdisplayPrecipitation([])
-      for (let i = 0; i < newTempatureDisplay.length; i++){
-        newTempatureDisplay[i] = tempature[newTempatureDisplay[i]]
-        newHourlyDisplay[i] = hourly[newHourlyDisplay[i]]
-        newPrecipitationDisplay[i] = precipitation[newPrecipitationDisplay[i]]
-      }
-      setdisplayHourly(newHourlyDisplay)
-      setdisplayTempature(newTempatureDisplay)
-      setdisplayPrecipitation(newPrecipitationDisplay)
     }
-  },[selectedOption,checked,filteredIndexes]);
+    if (checked == true) {
+      let newDisplay = []
+      for (let i = 0; i < fetched_weather.length; i++){
+        if (fetched_weather[i].precip > 0) {
+          console.log(fetched_weather[i].precip)
+          newDisplay.push(fetched_weather[i])
+        }
+      }
+      set_displayData(newDisplay)
+    }
+
+  },[selectedOption,checked]);
 
   return (
     <div className="App">
+      <h1> New York Weather App</h1>
       <Header
-        sunset={sunset}
-        sunrise={sunrise}
+        timezone={timezone}
+        today={today}
         highest={highest}
         lowest={lowest}
       />
-      <label>Filter By Morning | Afternoon | Night</label>
-      <Select
-        defaultValue={selectedOption}
-        onChange={setSelectedOption}
-        options={options}
-        className="react-select-container"
-      />
-      <br></br>
-      <label>Show Precipation:</label>
-      <input
-        type="checkbox"
+      <h3>Search/Filter</h3>
+      <Search
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
         checked={checked}
-        onChange={handleChange}
-        id = "checkbox-precipitation"
       />
-      <br></br>
-      <br></br>
-      <form  id = "tempature-form" onSubmit={handleSubmit}>
-        <label>Filter By Tempature Range: </label>
-        <br></br>
-        <label>Starting: </label>
-        <input type="text" id = "starting-tempature" onChange={handleChange}/>
-        <label>Ending: </label>
-        <input type="text" id = "ending-tempature" onChange={handleChange}/>
-        <input type="submit"/>
-      </form>
-      <br></br>
-      <button id = "reset" onClick = {handleSubmit}>Reset</button>
+      <h3>Dashboard</h3>
       <Dashboard
-        displayHourly={displayHourly}
-        displayTempature={displayTempature}
-        displayPrecipitation = {displayPrecipitation}
+        displayData={displayData} />
+      <h3>Charts</h3>
+      {min_chartData <= 0 ? (
+        <p>Loading...</p>
+      ) : (
+        <Charts
+            min_chartData={min_chartData}
+            max_chartData = {max_chartData}
       />
-    </div>
+      )}
+      </div>
   )
 }
 

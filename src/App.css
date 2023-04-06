@@ -4,12 +4,25 @@
   text-align: center;
 }
 
-
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
+
+.lists{
+  margin: 5px;
+  border: 1px gray solid;
+  padding: 5px;
+  text-align: center;
+}
+
+.search-container{
+  border: 1px black solid;
+  margin: 20px;
+  
+}
+
 .dashboard-container{
   display: flex;
   flex-direction: row;
@@ -27,12 +40,34 @@
   margin: 20px;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
-.react-select-container{
-  color:red;
-  background: red;
+.Charts{
+  border: 1px black solid;
+  margin: 20px;
+  display: flex;
+  flex-direction: row;
 }
+
 .header-slot{
   margin: 20px;
+}
+
+.form{
+  margin: 25px;
+}
+
+nav {
+  position: fixed; 
+  top: 0; 
+  right: 0; 
+}
+
+.home-link 
+{
+  border:1px dotted white;
+  background:#1d1f1d;
+  width:75px;
 }
